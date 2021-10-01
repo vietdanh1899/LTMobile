@@ -1,5 +1,6 @@
 {
   "expo": {
+<<<<<<< HEAD
     "name": "it-network",
     "slug": "it-network",
     "version": "1.0.0",
@@ -7,6 +8,17 @@
     "icon": "./assets/icon.png",
     "splash": {
       "image": "./assets/splash.png",
+=======
+    "name": "ITNetwork",
+    "slug": "ITNetwork",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "icon": "./assets/images/icon.png",
+    "scheme": "myapp",
+    "userInterfaceStyle": "automatic",
+    "splash": {
+      "image": "./assets/images/splash.png",
+>>>>>>> cdcaa6e (Initialize expo app)
       "resizeMode": "contain",
       "backgroundColor": "#ffffff"
     },
@@ -21,12 +33,22 @@
     },
     "android": {
       "adaptiveIcon": {
+<<<<<<< HEAD
         "foregroundImage": "./assets/adaptive-icon.png",
         "backgroundColor": "#FFFFFF"
       }
     },
     "web": {
       "favicon": "./assets/favicon.png"
+=======
+        "foregroundImage": "./assets/images/adaptive-icon.png",
+        "backgroundColor": "#ffffff"
+      },
+      "package": "com.skyfall.itnetwork"
+    },
+    "web": {
+      "favicon": "./assets/images/favicon.png"
+>>>>>>> cdcaa6e (Initialize expo app)
     }
   }
 }
