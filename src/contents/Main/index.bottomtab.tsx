@@ -1,3 +1,5 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
+/* eslint-disable react/prop-types */
 import * as React from 'react';
 import { Icon, withTheme } from 'react-native-elements';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
@@ -6,13 +8,15 @@ import {
 } from '@themes/ThemeComponent/Common/CommonProps';
 import { withTranslation } from 'react-i18next';
 import { compose } from 'recompose';
+import { useSelector } from 'react-redux';
+import { applyObjectSelector } from '@utils/selector';
+import { loginSelector } from '@contents/Auth/containers/Index/Login/redux/selector';
 import { StyleSheet } from 'react-native';
 import mainBottomTab from './routes';
 import HomeStack from './containers/Home/index.stack';
 import ExploreStack from './containers/Explore/index.stack';
 import MyJobScreen from './containers/MyJobs/screens';
 import ProfileStack from './containers/Profile/index.stack';
-import exploreStack from './containers/Explore/routes';
 
 const BottomTabs = createBottomTabNavigator();
 
@@ -23,13 +27,13 @@ function MainBottomTab(props: any) {
     },
     t,
   } = props;
+  const loginSelectorData = useSelector((state) => applyObjectSelector(loginSelector, state));
 
   return (
     <BottomTabs.Navigator
       tabBarOptions={{
         showLabel: true,
         activeTintColor: primary,
-        activeBackgroundColor: primary,
         inactiveTintColor: primary,
         style: StyleSheet.flatten([
           {
@@ -53,8 +57,7 @@ function MainBottomTab(props: any) {
           },
         ]),
         tabStyle: {
-          // backgroundColor: bgColor,
-          backgroundColor: 'transparent',
+          backgroundColor: bgColor,
           height: 55,
           paddingTop: 8,
           borderRadius: 20,
@@ -113,15 +116,6 @@ function MainBottomTab(props: any) {
       <BottomTabs.Screen
         name={mainBottomTab.exploreStack}
         component={ExploreStack}
-        listeners={({ navigation }) => ({
-          tabLongPress: (e) => {
-            // Prevent default action
-            // e.preventDefault();
-
-            // Do something with the `navigation` object
-            navigation.navigate(mainBottomTab.exploreStack, { screen: exploreStack.index }); // Here!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-          },
-        })}
         options={{
           tabBarLabel: t('bottom_tab:explore'),
           tabBarIcon: ({ focused, color, size }) => (focused ? (

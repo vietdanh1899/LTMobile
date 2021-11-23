@@ -1,6 +1,7 @@
 import { fromJS } from 'immutable';
 import _ from 'lodash';
 import qs from 'qs';
+import Filter from './filter';
 import { PER_PAGE } from 'react-native-dotenv'
 /**
  * Type
@@ -232,7 +233,6 @@ export function stringifyQuery(query: TQuery) {
   if (_.has(handledQuery, 's')) {
     handledQuery.s = JSON.stringify(handledQuery.s);
   }
-  console.log(handledQuery)
   const stringifiedQuery = qs.stringify(handledQuery, {
     indices: false,
     strictNullHandling: true,

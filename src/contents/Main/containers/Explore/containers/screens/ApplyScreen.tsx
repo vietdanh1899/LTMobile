@@ -10,7 +10,7 @@ import { Picker } from '@react-native-picker/picker';
 import { RootState } from '@src/redux/reducers';
 import { applyCV, fetchCV, hideError, setpickerValue, uploadCV } from '@src/redux/apply/applySlice';
 import { ActivityIndicator, Banner } from 'react-native-paper'
-import { fetchJobDetail, fetchJobDetailNoUpdate } from '@src/redux/jobDetail/jobDetailSlice';
+import { fetchJobDetail } from '@src/redux/jobDetail/jobDetailSlice';
 
 export default function ApplyScreen({ route }) {
   const dispatch = useDispatch();
@@ -136,7 +136,7 @@ export default function ApplyScreen({ route }) {
               if (pickerValue !== '') {
                 await dispatch(applyCV(route.params.jobId));
                 if (!!!error) {
-                  dispatch(fetchJobDetailNoUpdate(route.params.jobId));
+                  dispatch(fetchJobDetail(route.params.jobId));
                   NavigationService.goBack();
                   Alert.alert('Sent resume', 'Thank you for submitting your resume');
                 }

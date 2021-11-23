@@ -17,6 +17,7 @@ import { profileGetDetail } from '../redux/slice';
 import { Divider, List, Paragraph } from 'react-native-paper';
 import AvatarContainer from '@components/AvatarContainer';
 import { put } from '@utils/api';
+import { uploadFile } from '../containers/screens/CVScreen';
 
 const styles = StyleSheet.create({
   linearGradient: {
@@ -81,8 +82,10 @@ export default function ProfileScreen() {
     <Container>
       <StatusBar backgroundColor="transparent" />
       <Header
+        // backIcon
         leftColor="#fff"
         backgroundColor="#5864ec"
+        // height={100}
         title="Profile"
         rightComponent={(
           <QuickView row justifyContent="center" alignItems="center">
@@ -99,6 +102,15 @@ export default function ProfileScreen() {
             />
           }
         >
+          {/* <View style={{ height: 200, alignItems: "center", justifyContent: "center" }}>
+            {data?.profile?.profileUrl ?
+              <Image
+                style={{ resizeMode: "cover", width: '100%', height: '100%' }}
+                source={{ uri: data?.profile?.profileUrl }}
+              />
+              : <Avatar.Text size={100} label={data?.profile?.name.charAt(0)} />
+            }
+          </View> */}
           <AvatarContainer initialImage={data?.profile?.profileUrl} onChangeImage={handleChangeAvatar} />
           <Divider />
           <Text style={{ padding: 20, fontSize: 40, textAlign: "center" }}>{data?.profile?.name}</Text>

@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 import React, { PureComponent } from 'react';
 import { connect } from 'react-redux';
 import {
@@ -14,7 +15,6 @@ import Moment from 'moment';
 import { myJobsGetRecently } from '../../redux/slice';
 import mainBottomTab from '@contents/Main/routes';
 import { IconButton, TouchableRipple } from 'react-native-paper';
-import rootStack from '@contents/routes';
 
 export const typeJob = (type: string) => {
   if (type === 'FULLTIME') {
@@ -57,7 +57,7 @@ export const typeJob = (type: string) => {
 }
 
 
-export const renderListJob = ({ item }: { item: any }, inExplore?: any) => {
+export const renderListJob = ({ item }: { item: any }) => {
 
   return (
     <TouchableRipple
@@ -67,23 +67,14 @@ export const renderListJob = ({ item }: { item: any }, inExplore?: any) => {
           ...{ backgroundColor: item?.isAccepted ? '#b2ff59' : item?.isDenied ? '#ffcdd2' : '#ffffff' },
         }
       }
-      {...(inExplore ? {
-        onPress: () => NavigationService.navigate(
-          "JobDetailScreen",
-          { jobId: item.id }
-        )
-      } : {
-        onPress: () => NavigationService.push(rootStack.mainBottomTab, {
-          screen: mainBottomTab.exploreStack, params: {
-            screen: "JobDetailScreen",
-            params: { jobId: item.id },
-          }
-        })
+      onPress={() => NavigationService.navigate(mainBottomTab.exploreStack, {
+        screen: "JobDetailScreen",
+        params: { jobId: item.id },
       })}
     >
       <QuickView>
         <QuickView row justifyContent="space-between">
-          <QuickView row alignItems="center" flex={8} >
+          <QuickView row alignItems="center" flex={8}>
             <Image
               source={{ uri: item.user?.profile?.profileUrl }}
               resizeMode="contain"
@@ -91,12 +82,11 @@ export const renderListJob = ({ item }: { item: any }, inExplore?: any) => {
               width={50}
             />
             <Text
-
               color="#173147"
               fontWeight="bold"
               fontSize={20}
               marginLeft={10}
-              style={{ opacity: 0.8, minWidth: 0, paddingRight: 35 }}
+              style={{ opacity: 0.8 }}
             >
               {item?.user?.profile?.name}
             </Text>
@@ -106,14 +96,14 @@ export const renderListJob = ({ item }: { item: any }, inExplore?: any) => {
             {item?.isAccepted ?
               <Text
                 fontSize={10}
-                // marginLeft={5}
+                marginLeft={5}
                 style={{
                   backgroundColor: '#33691e',
                   color: '#ffffff',
                   borderRadius: 3,
                   fontWeight: 'bold',
                   paddingHorizontal: 5,
-                  paddingVertical: 5,
+                  paddingVertical: 5
                 }}
               >
                 Accepted
@@ -121,7 +111,7 @@ export const renderListJob = ({ item }: { item: any }, inExplore?: any) => {
               : item?.isDenied ?
                 <Text
                   fontSize={10}
-                  // marginLeft={5}
+                  marginLeft={5}
                   style={{
                     backgroundColor: '#b71c1c',
                     color: '#ffffff',
@@ -135,9 +125,7 @@ export const renderListJob = ({ item }: { item: any }, inExplore?: any) => {
                 </Text>
                 : null
             }
-            {item?.isFavorite ? <IconButton icon='heart' size={30} color="#b3296b" /> : null}
           </QuickView>
-
 
         </QuickView>
         <QuickView marginTop={15}>
@@ -181,7 +169,7 @@ export const renderListJob = ({ item }: { item: any }, inExplore?: any) => {
           </QuickView>
         </QuickView>
       </QuickView>
-    </TouchableRipple >
+    </TouchableRipple>
   );
 };
 

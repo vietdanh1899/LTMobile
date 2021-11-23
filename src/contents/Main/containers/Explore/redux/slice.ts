@@ -1,4 +1,5 @@
 import { createSlice } from '@reduxjs/toolkit';
+import { RootState } from '@src/redux/reducers';
 import { createArrayReducer, createObjectReducer } from '@utils/redux';
 import {
   INITIAL_STATE,
@@ -33,7 +34,7 @@ const jobSlice = createSlice({
       state.set('setFilter', action.payload.s),
     setMoreFilter(state: any, action) {
       return state.set('moreCategory', action.payload)
-    },
+    }
   },
 });
 export const {

@@ -15,7 +15,7 @@ import rootStack from '@contents/routes';
 import exploreStack from '@contents/Main/containers/Explore/routes';
 import { Global } from '@utils/appHelper';
 import { useSelector } from 'react-redux';
-import { favorite, fetchJobDetail, fetchJobDetailNoUpdate } from '@src/redux/jobDetail/jobDetailSlice';
+import { favorite, fetchJobDetail } from '@src/redux/jobDetail/jobDetailSlice';
 import { RootState, useAppThunkDispatch } from '@src/redux/reducers';
 import { ActivityIndicator, IconButton, TouchableRipple } from 'react-native-paper';
 import { headerHeight } from '@themes/ThemeComponent/Common/CommonProps';
@@ -51,7 +51,7 @@ export default function JobDetailScreen({ route: { params: { jobId } } }: { rout
     // <View></View>
     <Container>
       <ParallaxScrollView
-        refreshControl={<RefreshControl refreshing={loading} onRefresh={() => { dispatch(fetchJobDetailNoUpdate(jobId)) }} />}
+        refreshControl={<RefreshControl refreshing={loading} onRefresh={() => { dispatch(fetchJobDetail(jobId)) }} />}
         parallaxHeaderHeight={200}
         backgroundImageSource={{
           uri: introImg,

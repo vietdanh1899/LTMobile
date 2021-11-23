@@ -19,7 +19,6 @@ import {
   jobGetListSearch,
   jobGetListSearchSuccess,
   jobGetListSearchFail,
-  jobGetListFail,
 } from './slice';
 import {
   fetchAllJobs,
@@ -29,20 +28,12 @@ import {
   fetchAllCates,
 } from './api';
 
-import { setPage } from '@src/redux/tags/tagsSlice';
-
-
-export function* getListSaga({ payload }) {
+export function* getListSaga({ payload }: { payload: any }) {
   try {
     const data = yield call(fetchAllJobs, stringifyQuery(payload.query));
-    const currentPage = data.data.page;
-    if (data.data.count) {
-      yield put(setPage(currentPage))
-      yield put(jobGetListSuccess(data));
-    }
-    else throw ('No more')
+    yield put(jobGetListSuccess(data));
   } catch (error) {
-    yield put(jobGetListFail(error));
+    yield put(jobGetDetailFail(error));
   }
 }
 
