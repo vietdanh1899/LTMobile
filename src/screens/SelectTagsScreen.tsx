@@ -1,7 +1,7 @@
 import { Body, Button, Container, FlatList, Header, QuickView, Text } from '@components';
 import { jobGetList } from '@contents/Main/containers/Explore/redux/slice';
 import { RootState } from '@src/redux/reducers';
-import { setCurrentTag, setFilter, setIndex, setPage } from '@src/redux/tags/tagsSlice';
+import { setCurrentTag, setFilter, setIndex } from '@src/redux/tags/tagsSlice';
 import { get } from '@utils/api';
 import NavigationService from '@utils/navigation';
 import React, { useEffect, useState } from 'react';
@@ -18,7 +18,7 @@ export default function SelectTagsScreen() {
   const renderCenterHeaderComponent = () => (
     <QuickView>
       <Text color="#FFFFFF" fontSize={24} fontWeight="bold">
-        Pick Tag
+        Pick topics of your interest
       </Text>
     </QuickView>
   );
@@ -31,7 +31,6 @@ export default function SelectTagsScreen() {
           dispatch(setCurrentTag({ name: '', id: '' }));
           dispatch(jobGetList({ query: {} }));
           dispatch(setIndex(0));
-          dispatch(setPage(1));
           NavigationService.goBack();
         }}
       >
@@ -87,7 +86,7 @@ export default function SelectTagsScreen() {
       <Header
         backIcon
         backgroundColor="#5856d6"
-        // height={110}
+        height={150}
         centerComponent={renderCenterHeaderComponent()}
         rightComponent={renderRightHeaderComponent()}
       />
@@ -120,7 +119,6 @@ export default function SelectTagsScreen() {
             dispatch(setFilter({ s }));
             dispatch(jobGetList({ query: { s } }));;
             dispatch(setIndex(0));
-            dispatch(setPage(1));
             NavigationService.goBack();
           }}
         />

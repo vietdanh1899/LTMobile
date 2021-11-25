@@ -233,6 +233,7 @@ export function stringifyQuery(query: TQuery) {
   if (_.has(handledQuery, 's')) {
     handledQuery.s = JSON.stringify(handledQuery.s);
   }
+  console.log(handledQuery)
   const stringifiedQuery = qs.stringify(handledQuery, {
     indices: false,
     strictNullHandling: true,

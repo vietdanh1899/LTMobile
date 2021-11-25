@@ -74,7 +74,7 @@ export const renderListJob = ({ item }: { item: any }) => {
     >
       <QuickView>
         <QuickView row justifyContent="space-between">
-          <QuickView row alignItems="center" flex={8}>
+          <QuickView row alignItems="center" flex={8} >
             <Image
               source={{ uri: item.user?.profile?.profileUrl }}
               resizeMode="contain"
@@ -82,11 +82,12 @@ export const renderListJob = ({ item }: { item: any }) => {
               width={50}
             />
             <Text
+
               color="#173147"
               fontWeight="bold"
               fontSize={20}
               marginLeft={10}
-              style={{ opacity: 0.8 }}
+              style={{ opacity: 0.8, minWidth: 0, paddingRight: 35 }}
             >
               {item?.user?.profile?.name}
             </Text>
@@ -96,14 +97,14 @@ export const renderListJob = ({ item }: { item: any }) => {
             {item?.isAccepted ?
               <Text
                 fontSize={10}
-                marginLeft={5}
+                // marginLeft={5}
                 style={{
                   backgroundColor: '#33691e',
                   color: '#ffffff',
                   borderRadius: 3,
                   fontWeight: 'bold',
                   paddingHorizontal: 5,
-                  paddingVertical: 5
+                  paddingVertical: 5,
                 }}
               >
                 Accepted
@@ -111,7 +112,7 @@ export const renderListJob = ({ item }: { item: any }) => {
               : item?.isDenied ?
                 <Text
                   fontSize={10}
-                  marginLeft={5}
+                  // marginLeft={5}
                   style={{
                     backgroundColor: '#b71c1c',
                     color: '#ffffff',
@@ -125,7 +126,9 @@ export const renderListJob = ({ item }: { item: any }) => {
                 </Text>
                 : null
             }
+            {item?.isFavorite ? <IconButton icon='heart' size={30} color="#b3296b" /> : null}
           </QuickView>
+
 
         </QuickView>
         <QuickView marginTop={15}>

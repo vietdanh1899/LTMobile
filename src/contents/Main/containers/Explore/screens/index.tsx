@@ -35,10 +35,14 @@ import { jobGetList } from '../redux/slice';
 import { jobListSelector } from '../redux/selector';
 import { fetchAllJobs } from '../redux/api';
 import { renderListJob } from '../../MyJobs/containers/screens/ViewScreen';
+import { setCurrentTag, setIndex, setPage } from '@src/redux/tags/tagsSlice';
 
 interface Props {
   list: any;
   getList: (query?: TQuery) => any;
+  setCurrentTag: (tag: any) => any;
+  setIndex: (index: number) => any;
+  setPage: (page: number) => any;
 }
 const { width: screenWidth } = Dimensions.get('window');
 const styles = StyleSheet.create({
@@ -109,17 +113,17 @@ const titleList = [
 interface State {
   slider1ActiveSlide: number;
   search: string;
-  page: number;
+  // page: number;
   listPopularJob: Array<any>;
   bookmarks: any;
   category: any;
   // navigation: any;
-  index: number;
 }
 interface Props {
   list: any;
-  filterObject: any;
-  moreCategory: string;
+  currentTag: any;
+  index: number;
+  page: number;
 }
 
 class ExploreScreen extends React.Component<Props, State> {
@@ -132,60 +136,58 @@ class ExploreScreen extends React.Component<Props, State> {
     this.state = {
       slider1ActiveSlide: 1,
       search: '',
-      page: 1,
+      // page: 1,
       listPopularJob: [],
       bookmarks: [],
       category: '',
-      index: 0
+
     };
   }
 
   async componentDidMount() {
-    const { getList, filterObject } = this.props;
-    const payload: TQuery = {
-      s: filterObject,
-    };
-    const getListQuery: TQuery = {};
-    await getList(payload);
-    const getPopularJob = await fetchAllJobs(stringifyQuery(getListQuery));
+    const { getList } = this.props;
+    await getList({});
+    const getPopularJob = await fetchAllJobs(stringifyQuery({}));
     this.setState({ listPopularJob: getPopularJob.data.data });
   }
 
   onItemPress = (index: number) => {
-    const { getList } = this.props;
+    const { getList, setCurrentTag, setIndex, setPage } = this.props;
     if (index === 0) {
-      // this.setState({ page: 1 });
       getList({});
-      this.setState({ page: 1, category: '', index: index });
+      setCurrentTag({ name: '', id: '' })
+      this.setState({ category: '' });
+      setPage(0);
+      setIndex(index);
     }
-    // else if (index === 6) {
-    //   NavigationService.navigate(exploreStack.selectCateScreen);
-    // }
     else {
-      this.setState({ page: 1, index: index, category: titleList[index] });
       const payload: TQuery = {
         s: { name: { $contL: titleList[index] } },
         limit: 10,
-        // page: 0,
       };
-      // this.setState({  });
       getList(payload);
+      setCurrentTag({ name: '', id: '' });
+      this.setState({ category: titleList[index] });
+      setPage(0);
+      setIndex(index);
     }
   };
 
   loadMoreData = () => {
     const { getList } = this.props;
-    const { page } = this.state;
-
+    const { page, setPage } = this.props;
 
     const payload: TQuery = {
       limit: 10,
       page: page + 1,
-      s: { name: { $contL: this.state.category } },
+      s: {
+        name: { $contL: this.state.category },
+        ...(this.props.currentTag.id && { $and: [{ 'tags.id': this.props.currentTag.id }] })
+      },
+
     };
     getList(payload);
-
-    this.setState({ page: page + 1 })
+    if (!this.props.currentTag.id) setPage(page + 1);
   };
 
   renderItem = (
@@ -291,13 +293,12 @@ class ExploreScreen extends React.Component<Props, State> {
               <QuickView flex={6}>
                 <Text color="#707070" fontFamily="GothamRoundedBold">
                   {/* Top Companies */}
-                  Category: {this.props.moreCategory}
+                  Tag: {this.props.currentTag.name}
                 </Text>
               </QuickView>
               <TouchableOpacity
                 style={{ flex: 1 }}
                 onPress={() => {
-                  // NavigationService.navigate(exploreStack.FilterScreen);
                   NavigationService.navigate(exploreStack.selectCateScreen);
                 }}
               >
@@ -306,6 +307,7 @@ class ExploreScreen extends React.Component<Props, State> {
             </QuickView>
             <QuickView>
               <ButtonGroup
+                activeIndex={this.props.index}
                 marginHorizontal={15}
                 ref={(ref: any) => {
                   this.buttonGroup = ref;
@@ -327,7 +329,7 @@ class ExploreScreen extends React.Component<Props, State> {
             refreshControl={
               <RefreshControl
                 refreshing={loading}
-                onRefresh={() => { this.onItemPress(this.state.index) }}
+                onRefresh={() => { this.onItemPress(this.props.index) }}
               />
             }
             data={data}
@@ -394,12 +396,16 @@ class ExploreScreen extends React.Component<Props, State> {
 
 const mapStateToProps = (state: any) => ({
   list: parseArraySelector(applyArraySelector(jobListSelector, state)),
-  filterObject: state.job.toJS().setFilter,
-  moreCategory: state.job.toJS().moreCategory
+  currentTag: state.tags.currentTag,
+  index: state.tags.index,
+  page: state.tags.page
 });
 
 const mapDispatchToProps = (dispatch: any) => ({
   getList: (query?: TQuery) => dispatch(jobGetList({ query })),
+  setCurrentTag: (tag: any) => dispatch(setCurrentTag(tag)),
+  setIndex: (index: number) => dispatch(setIndex(index)),
+  setPage: (page: number) => dispatch(setPage(page))
 });
 
 const withReduce = connect(mapStateToProps, mapDispatchToProps, null, {

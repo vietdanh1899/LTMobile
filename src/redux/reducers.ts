@@ -11,6 +11,7 @@ import jobDetail from './jobDetail/jobDetailSlice';
 import apply from './apply/applySlice';
 import { Action, ThunkDispatch } from '@reduxjs/toolkit';
 import { useDispatch } from 'react-redux';
+import tags from './tags/tagsSlice';
 
 const appReducers = combineReducers({
   config,
@@ -20,7 +21,8 @@ const appReducers = combineReducers({
   profile,
   myJobs,
   jobDetail,
-  apply
+  apply,
+  tags
 });
 
 /**

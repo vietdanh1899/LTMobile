@@ -1,17 +1,14 @@
 import {
   Container,
-  Header,
-  ParallaxScrollView,
   QuickView,
   Text,
 } from '@components';
-import { applyObjectSelector, parseObjectSelector } from '@utils/selector';
-import React, { PureComponent } from 'react';
+import React from 'react';
 import FastImage from 'react-native-fast-image';
 import { ImageBackground, StyleSheet } from 'react-native';
-import { connect, useSelector } from 'react-redux';
-import { jobDetailSelector } from '../../redux/selector';
+import { useSelector } from 'react-redux';
 import CompanyTopTabs from './TopTabsCompany';
+import { RootState } from '@src/redux/reducers';
 
 const styles = StyleSheet.create({
   image: {
@@ -25,7 +22,7 @@ const styles = StyleSheet.create({
 });
 
 export default function CompanyDetailScreen() {
-  const data = useSelector((state) => state.jobDetail.data);
+  const data = useSelector((state: RootState) => state.jobDetail.data);
   return (
     <Container>
       <QuickView>

@@ -5,16 +5,16 @@ import ExploreScreen from './screens';
 import exploreStack from './routes';
 import EmployerScreens from './containers/screens/EmployerDetail';
 import FilterScreen from './containers/screens/FilterScreen';
-import SelectCateDetail from './containers/screens/SelectCateDetail';
 import ApplyScreen from './containers/screens/ApplyScreen';
 import CompanyDetailScreen from './containers/screens/CompanyDetailScreen';
 import SearchScreen from './containers/screens/SearchScreen';
+import SelectTagsScreen from '@src/screens/SelectTagsScreen';
 
 const Stack = createStackNavigator();
 
 export default function ExploreStack() {
   return (
-    <Stack.Navigator screenOptions={{headerShown: false}}>
+    <Stack.Navigator screenOptions={{ headerShown: false }}>
       <Stack.Screen name={exploreStack.index} component={ExploreScreen} />
       <Stack.Screen name="JobDetailScreen" component={JobDetailScreen} />
       <Stack.Screen name={exploreStack.FilterScreen} component={FilterScreen} />
@@ -24,7 +24,7 @@ export default function ExploreStack() {
       />
       <Stack.Screen
         name={exploreStack.selectCateScreen}
-        component={SelectCateDetail}
+        component={SelectTagsScreen}
       />
       <Stack.Screen name={exploreStack.applyScreen} component={ApplyScreen} />
 

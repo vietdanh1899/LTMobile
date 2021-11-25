@@ -3,17 +3,18 @@ import QuickView from '@components/Common/View/QuickView';
 import Button, { ButtonProps } from '../DefaultButton';
 import FlatList, { FlatListProps } from '../../FlatList/DefaultFlatList';
 
-export interface ButtonGroupProps extends Omit<ButtonProps, 'title'|'t'|'onPress'|'margin'|'marginLeft'|'marginVertical'>{
+export interface ButtonGroupProps extends Omit<ButtonProps, 'title' | 't' | 'onPress' | 'margin' | 'marginLeft' | 'marginVertical'> {
   propsChange?: boolean;
   titleList?: Array<string>;
   tList?: Array<string>;
   onItemPress?: (index: number) => any;
   flatListProps?: FlatListProps
   defaultActiveIndex?: number;
+  activeIndex: number;
 }
 
 interface State {
-  activeIndex: number;
+  // activeIndex: number;
 }
 
 class ButtonGroup extends React.Component<ButtonGroupProps, State> {
@@ -25,25 +26,25 @@ class ButtonGroup extends React.Component<ButtonGroupProps, State> {
 
   constructor(props: ButtonGroupProps) {
     super(props);
-    const { defaultActiveIndex } = this.props;
-    this.state = { activeIndex: defaultActiveIndex || 0 };
+    // const { defaultActiveIndex, activeIndex } = this.props;
+    // this.state = { activeIndex: defaultActiveIndex || 0 };
   }
 
-  static getDerivedStateFromProps(nextProps: any, prevState: any) {
-    const { propsChange } = nextProps;
-    const { activeIndex } = prevState;
-    if (propsChange && nextProps.defaultActiveIndex !== activeIndex) {
-      return {
-        activeIndex: nextProps.defaultActiveIndex,
-      };
-    }
-    return {
-      activeIndex,
-    };
-  }
+  // static getDerivedStateFromProps(nextProps: any, prevState: any) {
+  //   const { propsChange } = nextProps;
+  //   const { activeIndex } = prevState;
+  //   if (propsChange && nextProps.defaultActiveIndex !== activeIndex) {
+  //     return {
+  //       activeIndex: nextProps.defaultActiveIndex,
+  //     };
+  //   }
+  //   return {
+  //     activeIndex,
+  //   };
+  // }
 
   componentDidUpdate() {
-    const { activeIndex } = this.state;
+    const { activeIndex } = this.props;
     if (this.flatListRef && activeIndex) {
       this.flatListRef.flatListRef.scrollToIndex({
         animated: true,
@@ -53,7 +54,7 @@ class ButtonGroup extends React.Component<ButtonGroupProps, State> {
   }
 
   onPress = (index: number) => {
-    this.setState({ activeIndex: index });
+    // this.setState({ activeIndex: index });
     const { onItemPress } = this.props;
     if (onItemPress) {
       onItemPress(index);
@@ -61,7 +62,7 @@ class ButtonGroup extends React.Component<ButtonGroupProps, State> {
   };
 
   getIndex = () => {
-    const { activeIndex } = this.state;
+    const { activeIndex } = this.props;
     return activeIndex || 0;
   };
 
@@ -74,7 +75,7 @@ class ButtonGroup extends React.Component<ButtonGroupProps, State> {
       marginHorizontal,
       ...otherButtonProps
     } = this.props;
-    const { activeIndex } = this.state;
+    const { activeIndex } = this.props;
     const list = titleList || tList;
     const marginRight = marginRightProp || 10;
     if (list) {
@@ -102,7 +103,7 @@ class ButtonGroup extends React.Component<ButtonGroupProps, State> {
     const {
       titleList, flatListProps, defaultActiveIndex, propsChange,
     } = this.props;
-    const { activeIndex } = this.state;
+    const { activeIndex } = this.props;
     const FlatListButton: any = FlatList;
     return (
       <FlatListButton
