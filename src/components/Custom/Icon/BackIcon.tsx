@@ -11,8 +11,9 @@ class BackIcon extends PureComponent<any> {
     return (
       <QuickView
         position="absolute"
-        top={47}
-        left={17}
+        top={18}
+        left={0}
+        padding={18}
         style={{ zIndex: 1 }}
         onPress={() => NavigationService.goBack()}
         hitSlop={{

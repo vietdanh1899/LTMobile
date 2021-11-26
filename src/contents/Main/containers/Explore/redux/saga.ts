@@ -28,9 +28,15 @@ import {
   fetchAllCates,
 } from './api';
 
+import { store } from '@src/redux/store';
+import { setPage } from '@src/redux/tags/tagsSlice';
+
 export function* getListSaga({ payload }: { payload: any }) {
   try {
     const data = yield call(fetchAllJobs, stringifyQuery(payload.query));
+    // const currentPage = data.data.page;
+    // console.log('->>> current Page', currentPage);
+    // store.dispatch(setPage(currentPage))
     yield put(jobGetListSuccess(data));
   } catch (error) {
     yield put(jobGetDetailFail(error));

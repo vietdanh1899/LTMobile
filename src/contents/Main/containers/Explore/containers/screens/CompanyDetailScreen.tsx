@@ -1,4 +1,5 @@
 import {
+  BackIcon,
   Container,
   QuickView,
   Text,
@@ -25,6 +26,7 @@ export default function CompanyDetailScreen() {
   const data = useSelector((state: RootState) => state.jobDetail.data);
   return (
     <Container>
+      <BackIcon />
       <QuickView>
         <ImageBackground source={{ uri: data?.introImg }} style={styles.image}>
           <QuickView style={styles.child} />

@@ -130,6 +130,7 @@ class ExploreScreen extends React.Component<Props, State> {
   buttonGroup: any;
 
   iconRef: any;
+  onEndReachedCalledDuringMomentum: boolean;
 
   constructor(props: any) {
     super(props);
@@ -142,6 +143,7 @@ class ExploreScreen extends React.Component<Props, State> {
       category: '',
 
     };
+    this.onEndReachedCalledDuringMomentum = true;
   }
 
   async componentDidMount() {
@@ -157,7 +159,7 @@ class ExploreScreen extends React.Component<Props, State> {
       getList({});
       setCurrentTag({ name: '', id: '' })
       this.setState({ category: '' });
-      setPage(0);
+      setPage(1);
       setIndex(index);
     }
     else {
@@ -168,18 +170,17 @@ class ExploreScreen extends React.Component<Props, State> {
       getList(payload);
       setCurrentTag({ name: '', id: '' });
       this.setState({ category: titleList[index] });
-      setPage(0);
+      setPage(1);
       setIndex(index);
     }
   };
 
   loadMoreData = () => {
     const { getList } = this.props;
-    const { page, setPage } = this.props;
 
     const payload: TQuery = {
       limit: 10,
-      page: page + 1,
+      page: this.props.page + 1,
       s: {
         name: { $contL: this.state.category },
         ...(this.props.currentTag.id && { $and: [{ 'tags.id': this.props.currentTag.id }] })
@@ -187,7 +188,8 @@ class ExploreScreen extends React.Component<Props, State> {
 
     };
     getList(payload);
-    if (!this.props.currentTag.id) setPage(page + 1);
+    // if (!this.props.currentTag.id) 
+    setPage(this.props.page + 1);
   };
 
   renderItem = (
@@ -250,6 +252,12 @@ class ExploreScreen extends React.Component<Props, State> {
     </QuickView>
   );
 
+  onEndReached = ({ distanceFromEnd }) => {
+    if (!this.onEndReachedCalledDuringMomentum) {
+      this.loadMoreData();
+      this.onEndReachedCalledDuringMomentum = true;
+    }
+  }
   render() {
     const {
       listPopularJob,
@@ -326,6 +334,9 @@ class ExploreScreen extends React.Component<Props, State> {
           </QuickView>
 
           <FlatList
+            onEndReached={this.onEndReached.bind(this)}
+            // onEndReachedThreshold={0.5}
+            onMomentumScrollBegin={() => { this.onEndReachedCalledDuringMomentum = false; }}
             refreshControl={
               <RefreshControl
                 refreshing={loading}
@@ -334,7 +345,7 @@ class ExploreScreen extends React.Component<Props, State> {
             }
             data={data}
             renderItem={renderListJob}
-            onEndReached={this.loadMoreData}
+            // onEndReached={this.loadMoreData}
             ListHeaderComponent={() => (
               <Carousel
                 containerCustomStyle={{ backgroundColor: '#fff' }}
@@ -347,7 +358,7 @@ class ExploreScreen extends React.Component<Props, State> {
                 renderItem={this.renderItem}
               />
             )}
-            onEndReachedThreshold={0.1}
+            onEndReachedThreshold={0}
             ListFooterComponent={() => {
               const { list } = this.props;
               if (list.loading) {
@@ -360,7 +371,7 @@ class ExploreScreen extends React.Component<Props, State> {
               return <></>;
             }}
           />
-          {data.length > 0 ? null : (
+          {/* {data.length > 0 ? null : (
             <QuickView
               backgroundColor="#fff"
               flex={1}
@@ -387,7 +398,7 @@ class ExploreScreen extends React.Component<Props, State> {
                 </Text>
               </QuickView>
             </QuickView>
-          )}
+          )} */}
         </ImageBackground>
       </Container>
     );
@@ -411,5 +422,7 @@ const mapDispatchToProps = (dispatch: any) => ({
 const withReduce = connect(mapStateToProps, mapDispatchToProps, null, {
   forwardRef: true,
 });
-
+// export default connect(mapStateToProps, mapDispatchToProps, null, {
+//   forwardRef: true,
+// })(ExploreScreen);
 export default compose(withTheme, withReduce)(ExploreScreen as any);
