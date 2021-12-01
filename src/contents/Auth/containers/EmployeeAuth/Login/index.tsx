@@ -19,7 +19,7 @@ class EmployeeLoginScreen extends PureComponent {
               fontFamily="RobotoBold">IT</Text>
             <Image
               // source={require('@assets/images/illustration.png')}
-              source={{ uri: 'https://pics.freeicons.io/uploads/icons/png/7167593101582994867-512.png' }}
+              source={require('@assets/images/logoJob.png')}
               width={200}
             // tintColor='blue'
             />
