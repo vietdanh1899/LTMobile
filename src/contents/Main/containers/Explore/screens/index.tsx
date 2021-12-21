@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
-import React, { } from 'react';
-import { connect } from 'react-redux';
+import React, { useEffect, useState } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
 import {
   QuickView,
   Text,
@@ -10,9 +10,8 @@ import {
   FlatList,
   Image,
 } from '@components';
-import Carousel from 'react-native-snap-carousel';
 import {
-  Icon, withTheme,
+  Icon,
 } from 'react-native-elements';
 import {
   StyleSheet,
@@ -26,24 +25,16 @@ import {
   TouchableOpacity,
 } from 'react-native-gesture-handler';
 import NavigationService from '@utils/navigation';
-import { stringifyQuery, TQuery } from '@utils/redux';
+import { TQuery } from '@utils/redux';
 import { applyArraySelector, parseArraySelector } from '@utils/selector';
-import { compose } from 'recompose';
-import FastImage from 'react-native-fast-image';
 import exploreStack from '../routes';
 import { jobGetList } from '../redux/slice';
 import { jobListSelector } from '../redux/selector';
-import { fetchAllJobs } from '../redux/api';
 import { renderListJob } from '../../MyJobs/containers/screens/ViewScreen';
 import { setCurrentTag, setIndex, setPage } from '@src/redux/tags/tagsSlice';
+import { RootState } from '@src/redux/reducers';
+import { Divider } from 'react-native-paper';
 
-interface Props {
-  list: any;
-  getList: (query?: TQuery) => any;
-  setCurrentTag: (tag: any) => any;
-  setIndex: (index: number) => any;
-  setPage: (page: number) => any;
-}
 const { width: screenWidth } = Dimensions.get('window');
 const styles = StyleSheet.create({
   item: {
@@ -107,60 +98,36 @@ const titleList = [
   'Backend',
   'Frontend',
   'Engineer',
-  // 'See more',
 ];
 
-interface State {
-  slider1ActiveSlide: number;
-  search: string;
-  // page: number;
-  listPopularJob: Array<any>;
-  bookmarks: any;
-  category: any;
-  // navigation: any;
-}
-interface Props {
-  list: any;
-  currentTag: any;
-  index: number;
-  page: number;
-}
+export default function ExploreScreen() {
+  const dispatch = useDispatch();
+  const [onEndReachedCalledDuringMomentum, setonEndReachedCalledDuringMomentum] = useState(true);
+  const getList = (query?: TQuery) => dispatch(jobGetList({ query }));
+  const currentTag = useSelector((state: RootState) => state.tags.currentTag);
+  const index = useSelector((state: RootState) => state.tags.index);
+  const page = useSelector((state: RootState) => state.tags.page);
 
-class ExploreScreen extends React.Component<Props, State> {
-  buttonGroup: any;
+  const data = useSelector((state: RootState) =>
+    parseArraySelector(applyArraySelector(jobListSelector, state)).data
+  );
+  const loading = useSelector((state: RootState) =>
+    parseArraySelector(applyArraySelector(jobListSelector, state)).loading
+  );
+  const error = useSelector((state: RootState) =>
+    parseArraySelector(applyArraySelector(jobListSelector, state)).error
+  );
 
-  iconRef: any;
-  onEndReachedCalledDuringMomentum: boolean;
+  useEffect(() => {
+    getList({});
+  }, [])
 
-  constructor(props: any) {
-    super(props);
-    this.state = {
-      slider1ActiveSlide: 1,
-      search: '',
-      // page: 1,
-      listPopularJob: [],
-      bookmarks: [],
-      category: '',
-
-    };
-    this.onEndReachedCalledDuringMomentum = true;
-  }
-
-  async componentDidMount() {
-    const { getList } = this.props;
-    await getList({});
-    const getPopularJob = await fetchAllJobs(stringifyQuery({}));
-    this.setState({ listPopularJob: getPopularJob.data.data });
-  }
-
-  onItemPress = (index: number) => {
-    const { getList, setCurrentTag, setIndex, setPage } = this.props;
+  const onItemPress = (index: number) => {
     if (index === 0) {
       getList({});
-      setCurrentTag({ name: '', id: '' })
-      this.setState({ category: '' });
-      setPage(1);
-      setIndex(index);
+      dispatch(setCurrentTag({ name: '', id: '' }))
+      dispatch(setPage(1));
+      dispatch(setIndex(index));
     }
     else {
       const payload: TQuery = {
@@ -168,78 +135,13 @@ class ExploreScreen extends React.Component<Props, State> {
         limit: 10,
       };
       getList(payload);
-      setCurrentTag({ name: '', id: '' });
-      this.setState({ category: titleList[index] });
-      setPage(1);
-      setIndex(index);
+      dispatch(setCurrentTag({ name: '', id: '' }));
+      dispatch(setPage(1));
+      dispatch(setIndex(index));
     }
   };
 
-  loadMoreData = () => {
-    const { getList } = this.props;
-
-    const payload: TQuery = {
-      limit: 10,
-      page: this.props.page + 1,
-      s: {
-        name: { $contL: this.state.category },
-        ...(this.props.currentTag.id && { $and: [{ 'tags.id': this.props.currentTag.id }] })
-      },
-
-    };
-    getList(payload);
-    // if (!this.props.currentTag.id) 
-    setPage(this.props.page + 1);
-  };
-
-  renderItem = (
-    { item }: { item: any; },
-    // parallaxProps: any,
-  ) => (
-    <TouchableOpacity
-      onPress={() => {
-        NavigationService.navigate('JobDetailScreen',
-          { jobId: item.id });
-      }}
-    >
-      <FastImage
-        style={{ height: 200 }}
-        source={{
-          uri: item.introImg,
-          headers: { Authorization: 'someAuthToken' },
-          priority: FastImage.priority.normal,
-        }}
-        resizeMode={FastImage.resizeMode.cover}
-      />
-      <QuickView
-        row
-        position="absolute"
-        bottom={0}
-        center
-        style={{ zIndex: 999 }}
-      >
-        <QuickView flex={4}>
-          <Text color="#fff" fontSize={20} fontWeight="bold">
-            {item.name}
-          </Text>
-          <Text color="#fff">{item.user?.profile.name}</Text>
-        </QuickView>
-      </QuickView>
-    </TouchableOpacity>
-  );
-
-  renderCenterComponent = () => (
-    <QuickView row>
-      <Text color="#ffffff" fontSize={20}>
-        Vietnam
-      </Text>
-      <Text marginLeft={5} fontWeight="bold" color="#ffffff" fontSize={20}>
-        works
-      </Text>
-    </QuickView>
-  );
-
-  renderRightComponent = () => (
+  const renderRightComponent = () => (
     <QuickView row alignItems="center">
       <Icon
         type="antdesign"
@@ -252,140 +154,99 @@ class ExploreScreen extends React.Component<Props, State> {
     </QuickView>
   );
 
-  onEndReached = ({ distanceFromEnd }) => {
-    if (!this.onEndReachedCalledDuringMomentum) {
-      this.loadMoreData();
-      this.onEndReachedCalledDuringMomentum = true;
+  const loadMoreData = () => {
+    const payload: TQuery = {
+      limit: 10,
+      page: page + 1,
+      s: {
+        name: { $contL: (index === 0) ? '' : titleList[index] },
+        ...(currentTag.id && { $and: [{ 'tags.id': currentTag.id }] })
+      },
+
+    };
+    getList(payload);
+  };
+
+  const onEndReached = () => {
+    if (!onEndReachedCalledDuringMomentum) {
+      loadMoreData();
+      setonEndReachedCalledDuringMomentum(true);
     }
   }
-  render() {
-    const {
-      listPopularJob,
-      bookmarks,
-    } = this.state;
-    const {
-      list: { data, loading },
-    } = this.props;
-    data.map((job: any) => {
-      if (
-        !bookmarks.find((bookmark: any) => bookmark == job.id)
-        && job.isFavorite
-      ) {
-        bookmarks.push(job.id);
-      }
-    });
 
-    return (
-      <Container>
-        <StatusBar backgroundColor="transparent" />
-        <ImageBackground
-          style={styles.imageStyle}
-          source={{
-            uri:
-              'https://images.unsplash.com/photo-1586281380349-632531db7ed4?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=1350&q=80',
-          }}
+  return (
+    <Container>
+      <StatusBar backgroundColor="transparent" />
+      <ImageBackground
+        style={styles.imageStyle}
+        source={{
+          uri:
+            'https://images.unsplash.com/photo-1586281380349-632531db7ed4?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=1350&q=80',
+        }}
+      >
+        <Header
+          title="Explore Jobs"
+          rightComponent={renderRightComponent()}
+        />
+        <QuickView
+          style={{ backgroundColor: '#fff' }}
+          borderTopLeftRadius={5}
+          borderTopRightRadius={5}
         >
-          <Header
-            // backIcon
-            title="Explore Jobs"
-            // height={100}
-            rightComponent={this.renderRightComponent()}
-          />
-          <QuickView
-            style={{ backgroundColor: '#fff' }}
-            borderTopLeftRadius={5}
-            borderTopRightRadius={5}
-          >
-            <QuickView />
-            <QuickView row marginTop={15} paddingHorizontal={20}>
-              <QuickView flex={6}>
-                <Text color="#707070" fontFamily="GothamRoundedBold">
-                  {/* Top Companies */}
-                  Tag: {this.props.currentTag.name}
-                </Text>
-              </QuickView>
-              <TouchableOpacity
-                style={{ flex: 1 }}
-                onPress={() => {
-                  NavigationService.navigate(exploreStack.selectCateScreen);
-                }}
-              >
-                <Icon type="material" name="tune" color="#707070" />
-              </TouchableOpacity>
+          <QuickView />
+          <QuickView row marginTop={15} paddingHorizontal={20}>
+            <QuickView flex={6}>
+              <Text color="#707070" fontFamily="GothamRoundedBold">
+                {/* Top Companies */}
+                Tag: {currentTag.name}
+              </Text>
             </QuickView>
-            <QuickView>
-              <ButtonGroup
-                activeIndex={this.props.index}
-                marginHorizontal={15}
-                ref={(ref: any) => {
-                  this.buttonGroup = ref;
-                }}
-                titleList={titleList}
-                onItemPress={this.onItemPress}
-                defaultActiveIndex={0}
-                propsChange={false}
-                outline={false}
-                activeBackgroundColor="#9EB6FF"
-                backgroundColor="#FFFF"
-                titleColor="#707070"
-                activeTitleColor="#FFF"
-              />
-            </QuickView>
-          </QuickView>
-
-          <FlatList
-            onEndReached={this.onEndReached.bind(this)}
-            // onEndReachedThreshold={0.5}
-            onMomentumScrollBegin={() => { this.onEndReachedCalledDuringMomentum = false; }}
-            refreshControl={
-              <RefreshControl
-                refreshing={loading}
-                onRefresh={() => { this.onItemPress(this.props.index) }}
-              />
-            }
-            data={data}
-            renderItem={renderListJob}
-            // onEndReached={this.loadMoreData}
-            ListHeaderComponent={() => (
-              <Carousel
-                containerCustomStyle={{ backgroundColor: '#fff' }}
-                vertical={false}
-                sliderWidth={screenWidth}
-                loop
-                slideStyle={{ width: screenWidth - 30, zIndex: 3 }}
-                itemWidth={screenWidth - 120}
-                data={listPopularJob}
-                renderItem={this.renderItem}
-              />
-            )}
-            onEndReachedThreshold={0}
-            ListFooterComponent={() => {
-              const { list } = this.props;
-              if (list.loading) {
-                return (
-                  <QuickView style={{ flex: 1, alignItems: 'center' }}>
-                    <ActivityIndicator size="large" color="#ff6a00" />
-                  </QuickView>
-                );
-              }
-              return <></>;
-            }}
-          />
-          {/* {data.length > 0 ? null : (
-            <QuickView
-              backgroundColor="#fff"
-              flex={1}
-              alignItems="center"
-              justifyContent="center"
+            <TouchableOpacity
+              style={{ flex: 1 }}
+              onPress={() => {
+                NavigationService.navigate(exploreStack.selectCateScreen);
+              }}
             >
-              <Image
-                source={{
-                  uri:
-                    'https://www.startupindia.gov.in/content/dam/invest-india/Blogs/404.PNG',
-                }}
-                style={{ width: '100%' }}
-              />
-              <QuickView>
+              <Icon type="material" name="tune" color="#707070" />
+            </TouchableOpacity>
+          </QuickView>
+          <QuickView>
+            <ButtonGroup
+              activeIndex={index}
+              marginHorizontal={15}
+              titleList={titleList}
+              onItemPress={onItemPress}
+              defaultActiveIndex={0}
+              propsChange={false}
+              outline={false}
+              activeBackgroundColor="#9EB6FF"
+              backgroundColor="#FFFF"
+              titleColor="#707070"
+              activeTitleColor="#FFF"
+            />
+          </QuickView>
+        </QuickView>
+        <Divider />
+        <FlatList
+          onEndReached={onEndReached}
+          onMomentumScrollBegin={() => { setonEndReachedCalledDuringMomentum(false); }}
+          refreshControl={
+            <RefreshControl
+              refreshing={loading}
+              onRefresh={() => { onItemPress(index) }}
+            />
+          }
+          data={data}
+          renderItem={(item) => renderListJob(item, true)}
+          onEndReachedThreshold={0}
+          ListFooterComponent={() =>
+            (loading) ?
+              (
+                <QuickView style={{ flex: 1, alignItems: 'center' }}>
+                  <ActivityIndicator size="large" color="#ff6a00" />
+                </QuickView>
+              ) :
+              (error) ?
                 <Text
                   style={{
                     paddingHorizontal: 80,
@@ -394,35 +255,39 @@ class ExploreScreen extends React.Component<Props, State> {
                   }}
                   bold
                 >
-                  We have not found jobs for this search at the moment
-                </Text>
-              </QuickView>
+                  {JSON.stringify(error)}
+                </Text> : null
+          }
+        />
+        {data?.length > 0 ? null : (
+          <QuickView
+            backgroundColor="#fff"
+            flex={1}
+            alignItems="center"
+            justifyContent="center"
+          >
+            <Image
+              source={{
+                uri:
+                  'https://www.startupindia.gov.in/content/dam/invest-india/Blogs/404.PNG',
+              }}
+              style={{ width: '100%' }}
+            />
+            <QuickView>
+              <Text
+                style={{
+                  paddingHorizontal: 80,
+                  textAlign: 'center',
+                  color: '#000',
+                }}
+                bold
+              >
+                We have not found jobs for this search at the moment
+              </Text>
             </QuickView>
-          )} */}
-        </ImageBackground>
-      </Container>
-    );
-  }
+          </QuickView>
+        )}
+      </ImageBackground>
+    </Container>
+  );
 }
-
-const mapStateToProps = (state: any) => ({
-  list: parseArraySelector(applyArraySelector(jobListSelector, state)),
-  currentTag: state.tags.currentTag,
-  index: state.tags.index,
-  page: state.tags.page
-});
-
-const mapDispatchToProps = (dispatch: any) => ({
-  getList: (query?: TQuery) => dispatch(jobGetList({ query })),
-  setCurrentTag: (tag: any) => dispatch(setCurrentTag(tag)),
-  setIndex: (index: number) => dispatch(setIndex(index)),
-  setPage: (page: number) => dispatch(setPage(page))
-});
-
-const withReduce = connect(mapStateToProps, mapDispatchToProps, null, {
-  forwardRef: true,
-});
-// export default connect(mapStateToProps, mapDispatchToProps, null, {
-//   forwardRef: true,
-// })(ExploreScreen);
-export default compose(withTheme, withReduce)(ExploreScreen as any);

@@ -30,34 +30,32 @@ export default function RecruitmentScreen() {
 
   return (
     <Container>
-      <QuickView>
-        <QuickView
-          row
-          justifyContent="space-between"
-          paddingHorizontal={15}
-          paddingVertical={10}
-        >
-          <Text color="#000" fontSize={20} bold>
-            Opening Jobs
-          </Text>
-          <Text color="#000">
-            {data.length}
-            {' '}
-            Jobs
-          </Text>
-        </QuickView>
-        <Divider />
-        <FlatList
-          refreshControl={
-            <RefreshControl
-              refreshing={refreshing}
-              onRefresh={getData}
-            />
-          }
-          data={data}
-          renderItem={renderListJob}
-        />
+      <QuickView
+        row
+        justifyContent="space-between"
+        paddingHorizontal={15}
+        paddingVertical={10}
+      >
+        <Text color="#000" fontSize={20} bold>
+          Opening Jobs
+        </Text>
+        <Text color="#000">
+          {data.length}
+          {' '}
+          Jobs
+        </Text>
       </QuickView>
+      <Divider />
+      <FlatList
+        refreshControl={
+          <RefreshControl
+            refreshing={refreshing}
+            onRefresh={getData}
+          />
+        }
+        data={data}
+        renderItem={renderListJob}
+      />
     </Container>
   );
 }

@@ -1,11 +1,7 @@
 import { fromJS } from 'immutable';
 import _ from 'lodash';
 import qs from 'qs';
-import Filter from './filter';
 import { PER_PAGE } from 'react-native-dotenv'
-import { useDispatch } from 'react-redux';
-import { setPage } from '@src/redux/tags/tagsSlice';
-import { store } from '@src/redux/store';
 /**
  * Type
  */

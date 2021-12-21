@@ -4,7 +4,7 @@ import { get, post } from '@utils/api';
 
 export const favorite = createAsyncThunk('jobDetail/favorite', async (jobId: string, thunkAPI) => {
   const response = await post(`/jobs/${jobId}/favorites`);
-  thunkAPI.dispatch(fetchJobDetail(jobId));
+  thunkAPI.dispatch(fetchJobDetailNoUpdate(jobId));
   return response;
 })
 
@@ -53,8 +53,14 @@ export const {
 export default jobDetailSlice.reducer;
 
 export const fetchJobDetail = (jobId: string) => async (dispatch: any) => {
-  dispatch(jobDetail_loading);
+  dispatch(jobDetail_loading());
   const response = await get(`/jobs/getOne/recently/${jobId}`);
+  dispatch(jobDetail_success(response.data));
+}
+
+export const fetchJobDetailNoUpdate = (jobId: string) => async (dispatch: any) => {
+  dispatch(jobDetail_loading());
+  const response = await get(`/jobs/getOne/${jobId}`);
   dispatch(jobDetail_success(response.data));
 }
 

@@ -1,47 +1,54 @@
 import {
   Container,
-  FlatList,
+  // FlatList,
   Header,
   QuickView,
   Text,
 } from '@components';
 import { TQuery } from '@utils/redux';
-import React, { PureComponent } from 'react';
-import { Dimensions, RefreshControl, StatusBar, StyleSheet } from 'react-native';
-import { SearchBar } from 'react-native-elements';
-import { connect } from 'react-redux';
+import React, { useRef, useState } from 'react';
+import { Dimensions, FlatList, RefreshControl, StatusBar, View } from 'react-native';
+import { SearchBar, Tooltip } from 'react-native-elements';
+import { useDispatch, useSelector } from 'react-redux';
 import * as _ from 'lodash';
 import { applyArraySelector, parseArraySelector } from '@utils/selector';
 import { jobListSearchSelector } from '../../redux/selector';
 import { jobGetListSearch } from '../../redux/slice';
 import { RootState } from '@src/redux/reducers';
 import { renderListJob } from '@contents/Main/containers/MyJobs/containers/screens/ViewScreen';
+import { Divider, Menu, Portal, Provider, TouchableRipple, Button, List, Card, Surface, IconButton } from 'react-native-paper';
+import { get } from '@utils/api';
+import { headerHeight } from '@themes/ThemeComponent/Common/CommonProps';
 
 const screenWidth = Math.round(Dimensions.get('window').width);
 
-interface Props {
-  getListSearch: any;
-  list: any;
-}
+export default function SearchScreen() {
+  const [search, setsearch] = useState('');
+  const dispatch = useDispatch();
+  const getListSearch = (query?: TQuery) => dispatch(jobGetListSearch({ query }));
+  const metadata = useSelector((state: RootState) => parseArraySelector(applyArraySelector(jobListSearchSelector, state)).metadata);
+  const data = useSelector((state: RootState) => parseArraySelector(applyArraySelector(jobListSearchSelector, state)).data);
+  const loading = useSelector((state: RootState) => parseArraySelector(applyArraySelector(jobListSearchSelector, state)).loading);
 
-interface State {
-  search: string;
-  bookmarks: any;
-  page: number;
-}
+  const [visible, setVisible] = useState(true);
+  const openMenu = () => setVisible(true);
+  const closeMenu = () => setVisible(false);
+  const [autoComplete, setautoComplete] = useState<{ name: string, id: string }[]>([]);
 
-class SearchScreen extends PureComponent<Props, State> {
-  constructor(props: any) {
-    super(props);
-    this.state = {
-      search: '',
-      bookmarks: [],
-      page: 1,
-    };
+  const flatListRef = useRef<FlatList>(null);
+  const toTop = () => {
+    // use current
+    flatListRef?.current?.scrollToOffset({ animated: true, offset: 0 })
   }
 
-  renderCenterComponent = () => {
-    const { search } = this.state;
+  const getSearchAutoComplete = async (s: string) => {
+    const response = await get('/jobs/search/autocomplete', { s: s });
+    console.log(response.data);
+    setautoComplete(response.data);
+    openMenu();
+  }
+
+  const renderCenterComponent = () => {
     return (
       <SearchBar
         containerStyle={{
@@ -57,105 +64,98 @@ class SearchScreen extends PureComponent<Props, State> {
         platform="android"
         clearIcon
         returnKeyType="search"
-        onChangeText={(text) => { this.setState({ search: text }) }}
+        onChangeText={(text) => {
+          setsearch(text);
+          getSearchAutoComplete(text);
+        }}
         value={search}
         searchIcon
         placeholderTextColor="black"
         cancelIcon
-        onSubmitEditing={() => this.sendSearchRequest(this.state.search)}
+        onSubmitEditing={() => {
+          sendSearchRequest(search);
+          closeMenu();
+        }}
+        onCancel={() => closeMenu()}
+        onFocus={() => openMenu()}
       />
     );
   };
-
-  sendSearchRequest = (payload: any) => {
-    const { getListSearch } = this.props;
+  const sendSearchRequest = (payload: any) => {
     const objectFilter: any = [];
     objectFilter.push({ name: { $contL: payload } });
-    // objectFilter.push({ lowestWage: { $eq: payload } });
-    // objectFilter.push({ highestWage: { $eq: payload } });
-    objectFilter.push({ 'categories.name': { $contL: payload } });
+    objectFilter.push({ 'tags.name': { $contL: payload } });
     objectFilter.push({ 'user.profile.name': { $contL: payload } });
     objectFilter.push({ 'address.description': { $contL: payload } });
     const s = {
       $or: objectFilter,
     };
-    getListSearch({ s });
+    getListSearch({ s, limit: 9999 });
+    toTop();
   };
-
-  loadMoreData = () => {
-    const { getListSearch } = this.props;
-    const { page } = this.state;
-    this.setState({ page: page + 1 });
-    const objectFilter: any = [];
-    objectFilter.push({ name: { $contL: this.state.search } });
-    // objectFilter.push({ lowestWage: { $eq: payload } });
-    // objectFilter.push({ highestWage: { $eq: payload } });
-    objectFilter.push({ 'categories.name': { $contL: this.state.search } });
-    objectFilter.push({ 'user.profile.name': { $contL: this.state.search } });
-    objectFilter.push({ 'address.description': { $contL: this.state.search } });
-    const s = {
-      $or: objectFilter,
-    };
-    const payload: TQuery = {
-      s,
-      limit: 10,
-      page,
-    };
-    getListSearch(payload);
-  };
-
-  render() {
-    const {
-      list: { data, metadata, loading },
-    } = this.props;
-    return (
-      <Container>
+  return (
+    <Container>
+      <Portal.Host>
         <StatusBar backgroundColor="transparent" />
         <Header
           backIcon
           title="Job search"
-          // height={100}
         />
+
         <QuickView backgroundColor="white" height={80} justifyContent="center" shadow>
-          {this.renderCenterComponent()}
+          {renderCenterComponent()}
+
+          <Portal>
+            {visible ?
+              <View
+                style={{
+                  top: headerHeight + 50, borderBottomLeftRadius: 20, borderBottomRightRadius: 20, backgroundColor: '#E0E7EA',
+                  marginHorizontal: 10
+                }}
+              >
+                <Divider />
+                {autoComplete.map((i) => (
+                  <List.Item
+                    key={i.id}
+                    title={i.name}
+                    style={{}}
+                    onPress={() => {
+                      setsearch(i.name);
+                      sendSearchRequest(i.name);
+                      closeMenu();
+                    }}
+                  />
+                )
+                )}
+              </View> : null}
+
+          </Portal>
+
           <Text fontSize={14} color="black" marginLeft={20}>
             {metadata.total}
             {' '}
             jobs matched
           </Text>
+
+
         </QuickView>
 
         <QuickView alignItems="center" flex={1}>
-          {/* <ActivityIndicator animating={loading} size='large'/> */}
           <FlatList
+            ref={flatListRef}
             data={data}
             renderItem={renderListJob}
-            onEndReached={this.loadMoreData}
             contentContainerStyle={{ flexGrow: 0 }}
             refreshControl={
               <RefreshControl
                 size={0}
                 refreshing={loading}
-                onRefresh={() => this.sendSearchRequest(this.state.search)}
+                onRefresh={() => sendSearchRequest(search)}
               />
             }
           />
         </QuickView>
-
-      </Container>
-    );
-  }
+      </Portal.Host>
+    </Container >
+  );
 }
-
-const mapStateToProps = (state: RootState) => ({
-  list: parseArraySelector(applyArraySelector(jobListSearchSelector, state)),
-});
-
-const mapDispatchToProps = (dispatch: any) => ({
-  getListSearch: (query?: TQuery) => dispatch(jobGetListSearch({ query })),
-});
-
-export default connect(
-  mapStateToProps,
-  mapDispatchToProps,
-)(SearchScreen as any);

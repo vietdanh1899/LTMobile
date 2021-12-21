@@ -4,23 +4,17 @@ import { connect } from 'react-redux';
 import {
   QuickView,
   Text,
-  Container,
-  Header,
-  Body,
   Button,
   Image,
 } from '@components';
-import MapView, { Callout, Marker } from 'react-native-maps';
+import MapView, { Marker } from 'react-native-maps';
 import Carousel from 'react-native-snap-carousel';
 import { Dimensions, StatusBar, StyleSheet } from 'react-native';
 import { Color } from '@themes/Theme';
 import { vndPriceFormat } from '@utils/functions';
-import NavigationService from '@utils/navigation';
 import { lightPrimaryColor } from '@themes/ThemeComponent/Common/Color';
-import Geolocation from '@react-native-community/geolocation';
 import { Icon } from 'react-native-elements';
 import { myJobsGetNearest } from '../../../MyJobs/redux/slice';
-import { info } from 'console';
 const LATITUDE = 16.06375;
 const LONGITUDE = 108.17969;
 const coordinates = [

@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-unused-vars */
 import React, { PureComponent } from 'react';
 import { connect } from 'react-redux';
 import {
@@ -15,6 +14,7 @@ import Moment from 'moment';
 import { myJobsGetRecently } from '../../redux/slice';
 import mainBottomTab from '@contents/Main/routes';
 import { IconButton, TouchableRipple } from 'react-native-paper';
+import rootStack from '@contents/routes';
 
 export const typeJob = (type: string) => {
   if (type === 'FULLTIME') {
@@ -57,7 +57,7 @@ export const typeJob = (type: string) => {
 }
 
 
-export const renderListJob = ({ item }: { item: any }) => {
+export const renderListJob = ({ item }: { item: any }, inExplore?: any) => {
 
   return (
     <TouchableRipple
@@ -67,16 +67,25 @@ export const renderListJob = ({ item }: { item: any }) => {
           ...{ backgroundColor: item?.isAccepted ? '#b2ff59' : item?.isDenied ? '#ffcdd2' : '#ffffff' },
         }
       }
-      onPress={() => NavigationService.navigate(mainBottomTab.exploreStack, {
-        screen: "JobDetailScreen",
-        params: { jobId: item.id },
+      {...(inExplore ? {
+        onPress: () => NavigationService.navigate(
+          "JobDetailScreen",
+          { jobId: item.id }
+        )
+      } : {
+        onPress: () => NavigationService.push(rootStack.mainBottomTab, {
+          screen: mainBottomTab.exploreStack, params: {
+            screen: "JobDetailScreen",
+            params: { jobId: item.id },
+          }
+        })
       })}
     >
       <QuickView>
         <QuickView row justifyContent="space-between">
           <QuickView row alignItems="center" flex={8} >
             <Image
-              source={{ uri: item.user?.profile?.profileUrl }}
+              source={{ uri: item?.user?.profile?.profileUrl }}
               resizeMode="contain"
               height={50}
               width={50}
@@ -139,18 +148,18 @@ export const renderListJob = ({ item }: { item: any }) => {
             style={{ letterSpacing: 0.5 }}
             fontFamily="GothamRoundedBold"
           >
-            {item.name}
+            {item?.name}
           </Text>
           <QuickView row alignItems="center" justifyContent="space-between">
             <Text color="#B5BABD" fontSize={15}>
               Posted on
               {' '}
-              {Moment(item.createdat).format('D/M/Y')}
+              {Moment(item?.createdat).format('D/M/Y')}
             </Text>
             <Text color="#B5BABD" fontSize={15}>
               Expires on
               {' '}
-              {Moment(item.deadline).format('D/M/Y')}
+              {Moment(item?.deadline).format('D/M/Y')}
             </Text>
           </QuickView>
         </QuickView>
@@ -168,11 +177,11 @@ export const renderListJob = ({ item }: { item: any }) => {
               size={16}
               color="#707070"
             />
-            {typeJob(item.type)}
+            {typeJob(item?.type)}
           </QuickView>
         </QuickView>
       </QuickView>
-    </TouchableRipple>
+    </TouchableRipple >
   );
 };
 

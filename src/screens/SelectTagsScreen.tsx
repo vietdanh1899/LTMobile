@@ -18,7 +18,7 @@ export default function SelectTagsScreen() {
   const renderCenterHeaderComponent = () => (
     <QuickView>
       <Text color="#FFFFFF" fontSize={24} fontWeight="bold">
-        Pick topics of your interest
+        Pick Tag
       </Text>
     </QuickView>
   );
@@ -87,7 +87,7 @@ export default function SelectTagsScreen() {
       <Header
         backIcon
         backgroundColor="#5856d6"
-        height={150}
+        // height={110}
         centerComponent={renderCenterHeaderComponent()}
         rightComponent={renderRightHeaderComponent()}
       />
